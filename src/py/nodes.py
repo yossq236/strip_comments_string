@@ -30,9 +30,9 @@ class StripCommentsStringMultiline:
 
     def strip_comments(self, text):
         strip_text = re.sub("(#+.*?$)|(//.*?$)|(/\\*.*?\\*/)", "", text, flags=re.MULTILINE | re.DOTALL)
-        raw_lines = strip_text.splitlines()
-        strip_lines = list(filter(lambda line: line.strip() == "", raw_lines))
-        return ("\n".join(strip_lines),)
+        strip_lines = list(filter(lambda n: n.strip() != "", strip_text.splitlines()))
+        result = "\n".join(strip_lines)
+        return (result,)
 
     #@classmethod
     #def IS_CHANGED(s, image, string_field, int_field, float_field, print_to_screen):
