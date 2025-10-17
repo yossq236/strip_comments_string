@@ -7,7 +7,7 @@ name = "strip_comments_string"
 version = "0.0.1"
 description = "A custom node for ComfyUI that strips comments from strings."
 authors = [
-  {name = "yos", email = "yf0659@gmail.com"}
+  {name = "yossq236"}
 ]
 readme = "README.md"
 license = {text = "MIT license"}

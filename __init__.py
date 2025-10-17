@@ -6,8 +6,8 @@ __all__ = [
     
 ]
 
-__author__ = """yos"""
-__email__ = "yf0659@gmail.com"
+__author__ = """yf0659"""
+__email__ = ""
 __version__ = "0.0.1"
 
 from .src.py.nodes import NODE_CLASS_MAPPINGS
