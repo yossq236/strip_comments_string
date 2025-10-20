@@ -20,13 +20,13 @@ from server import PromptServer
 from aiohttp import web
 
 NODE_DIR = os.path.dirname(__file__)
-NODE_LIB_DIR = os.path.join(NODE_DIR, "lib")
-NODE_LIB_EDITOR_WIDGET_DIR = os.path.join(NODE_LIB_DIR, "widget_editor")
+NODE_LIB_DIR = os.path.join(NODE_DIR, "scripts")
+NODE_LIB_WIDGET_EDITOR_DIR = os.path.join(NODE_LIB_DIR, "widget_editor")
 
-@PromptServer.instance.routes.get("/extensions/strip_comments_string/lib/widget_editor/{filename}")
+@PromptServer.instance.routes.get("/extensions/strip_comments_string/scripts/widget_editor/{filename}")
 async def get_lib_editor_widget_files(request):
     filename = request.match_info["filename"]
-    filepath = os.path.join(NODE_LIB_EDITOR_WIDGET_DIR, filename)
+    filepath = os.path.join(NODE_LIB_WIDGET_EDITOR_DIR, filename)
     if os.path.isfile(filepath):
         return web.FileResponse(filepath)
     return web.Response(status=404)

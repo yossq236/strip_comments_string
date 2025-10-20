@@ -38,7 +38,7 @@ module.exports = {
         library: {
             type: 'module',
         },
-        path: path.resolve(__dirname, 'lib/widget_editor'),
+        path: path.resolve(__dirname, 'scripts/widget_editor'),
         filename: '[name].bundle.js'
     },
 };
