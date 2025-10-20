@@ -1,5 +1,5 @@
 import { app } from "/scripts/app.js";
-import { EditorWidget } from "../lib/editor_widget/main.bundle.js"
+import { WidgetEditor } from "../lib/widget_editor/main.bundle.js"
 
 function updateOptionsAll(newOptions) {
   app.graph?.nodes?.forEach(node => {
@@ -77,17 +77,17 @@ app.registerExtension({
         defaultValue: "",
         category: ["Strip Comments String", "Editor", "Custom Word Data"],
         onChange: (newVal, oldVal) => {
-          EditorWidget.setWordFromCSVString(newVal);
+          WidgetEditor.setWordFromCSVString(newVal);
         },
       },
     ],
     async init() {
-      EditorWidget.setupLanguage();
+      WidgetEditor.setupLanguage();
     },
     async getCustomWidgets(app) {
         return {
-            EditorWidget: (node, inputName, inputData, app, widgetName) => {
-                const editor = new EditorWidget({
+            WidgetEditor: (node, inputName, inputData, app, widgetName) => {
+                const editor = new WidgetEditor({
                   theme: app.extensionManager.setting.get("StripCommentsStringMultiline.Editor.theme"),
                   fontSize: app.extensionManager.setting.get("StripCommentsStringMultiline.Editor.fontsize")
                 });

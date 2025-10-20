@@ -6,7 +6,7 @@ __all__ = [
     
 ]
 
-__author__ = """yf0659"""
+__author__ = """yossq236"""
 __email__ = ""
 __version__ = "0.0.1"
 
@@ -21,9 +21,9 @@ from aiohttp import web
 
 NODE_DIR = os.path.dirname(__file__)
 NODE_LIB_DIR = os.path.join(NODE_DIR, "lib")
-NODE_LIB_EDITOR_WIDGET_DIR = os.path.join(NODE_LIB_DIR, "editor_widget")
+NODE_LIB_EDITOR_WIDGET_DIR = os.path.join(NODE_LIB_DIR, "widget_editor")
 
-@PromptServer.instance.routes.get("/extensions/strip_comments_string/lib/editor_widget/{filename}")
+@PromptServer.instance.routes.get("/extensions/strip_comments_string/lib/widget_editor/{filename}")
 async def get_lib_editor_widget_files(request):
     filename = request.match_info["filename"]
     filepath = os.path.join(NODE_LIB_EDITOR_WIDGET_DIR, filename)

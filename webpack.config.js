@@ -6,7 +6,7 @@ module.exports = {
     mode: 'production', 
     //mode: 'development', 
 
-    entry: './src/ts/editor_widget.ts', 
+    entry: './src/ts/widget_editor.ts', 
 
     module: {
         rules: [
@@ -38,7 +38,7 @@ module.exports = {
         library: {
             type: 'module',
         },
-        path: path.resolve(__dirname, 'lib/editor_widget'),
+        path: path.resolve(__dirname, 'lib/widget_editor'),
         filename: '[name].bundle.js'
     },
 };

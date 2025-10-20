@@ -13,7 +13,7 @@ class StripCommentsStringMultiline:
                 "text": ("STRING", {
                     "multiline": True,
                     "default": "",
-                    "widgetType": "EditorWidget",
+                    "widgetType": "WidgetEditor",
                 }),
             },
         }
