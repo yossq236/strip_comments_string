@@ -1,5 +1,5 @@
 import { app } from "/scripts/app.js";
-import { WidgetEditor } from "../lib/widget_editor/main.bundle.js"
+import { WidgetEditor } from "../scripts/widget_editor/main.bundle.js"
 
 function updateOptionsAll(newOptions) {
   app.graph?.nodes?.forEach(node => {
