@@ -17,12 +17,19 @@ export class WidgetEditor {
         this._container.addEventListener('keydown', (event) => {
           event.stopPropagation();
         });
+        this._container.addEventListener('keyup', (event) => {
+          event.stopPropagation();
+        });
+        this._container.addEventListener('keypress', (event) => {
+          event.stopPropagation();
+        });
         this._editor = monaco.editor.create(this._container, {
             automaticLayout: true,
             value: '',
             fontSize: options.fontSize,
             theme: options.theme,
             language: 'myCustomLanguage',
+            folding: true,
         });
     }
 
@@ -37,7 +44,14 @@ export class WidgetEditor {
         this._editor.setValue(newValue);
     }
 
-    public updateOptions(newOptions: any) {
+    public saveViewState(): string {
+      return JSON.stringify(this._editor.saveViewState());
+    }
+    public restoreViewState(state): void {
+      this._editor.restoreViewState(JSON.parse(state));
+    }
+
+    public updateOptions(newOptions: any): void {
       this._editor.updateOptions(newOptions);
     }
 
@@ -118,6 +132,54 @@ export class WidgetEditor {
             suggestions: _suggestions,
           };
         }
+      });
+      monaco.languages.registerFoldingRangeProvider('myCustomLanguage', {
+        provideFoldingRanges: (model, context, token) => {
+          const ranges = [];
+          const map_range_start = new Map<number,number>;
+          const ranges_add = (block_level:number, range_end:number) => {
+            const range_start = map_range_start.get(block_level) ?? 0;
+            if ((0 < range_start) && (0 < (range_end - range_start))) {
+              ranges.push({
+                start: range_start,
+                end: range_end,
+                kind: monaco.languages.FoldingRangeKind.Region,
+              });
+            }
+          };
+          // 
+          let current_lineno = -1;
+          model.getLinesContent().forEach((line,lineno) => {
+            current_lineno = lineno + 1;
+            const block_mat = /^#+/.exec(line);
+            if (block_mat) {
+              const block_lvl = block_mat[0].length;
+              map_range_start.keys().filter((key) => block_lvl < key).forEach((internal_lvl) => {
+                ranges_add(internal_lvl, current_lineno - 1);
+                map_range_start.set(internal_lvl, 0);
+              });
+              ranges_add(block_lvl, current_lineno - 1);
+              map_range_start.set(block_lvl, current_lineno);
+            }
+          });
+          map_range_start.keys().forEach((block_lvl) => {
+            ranges_add(block_lvl, current_lineno);
+          });
+          //
+          ranges.sort((range1, range2) => {
+            const cmp1 = range1.start - range2.start;
+            if (cmp1 != 0) {
+              return cmp1;
+            }
+            const cmp2 = (range1.end - range1.start) - (range2.end - range2.start);
+            if (cmp2 != 0) {
+              return cmp2;
+            }
+            return 0;
+          });
+          //
+          return ranges;
+        },
       });
     }
 

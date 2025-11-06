@@ -16,6 +16,9 @@ class StripCommentsStringMultiline:
                     "widgetType": "WidgetEditor",
                 }),
             },
+            "hidden": {
+                "editor_state": ("STRING",),
+            },
         }
 
     RETURN_TYPES = ("STRING",)

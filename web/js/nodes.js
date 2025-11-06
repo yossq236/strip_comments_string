@@ -1,30 +1,38 @@
-import { app } from "/scripts/app.js";
-import { WidgetEditor } from "../scripts/widget_editor/main.bundle.js"
+import { app } from '/scripts/app.js';
+import { WidgetEditor } from '../scripts/widget_editor/main.bundle.js';
+import { createApp } from 'vue';
+import FileUpload from 'primevue/fileupload';
+
+const CLASSNAME_NODE = 'StripCommentsStringMultiline';
+const ID_NODE = 'yossq236.' + CLASSNAME_NODE;
+const ID_SETTINGS_THEME = ID_NODE + '.Editor.theme';
+const ID_SETTINGS_FONTSIZE = ID_NODE + '.Editor.fontsize';
+const ID_SETTINGS_WORD_FILE = ID_NODE + '.Editor.word.file';
+const ID_SETTINGS_WORD_DATA = ID_NODE + '.Editor.word.data';
+
+const ID_WIDGET_TEXT = 'text';
+const ID_WIDGET_EDITOR_STATE = 'editor_state';
 
 function updateOptionsAll(newOptions) {
-  app.graph?.nodes?.forEach(node => {
-    if (node.type == "StripCommentsStringMultiline") {
-      node.widgets?.forEach(widget => {
-        if (widget.name == "text") {
-          widget.options.updateOptions(newOptions);
-        }
-      });
-    }
+  app.graph?.nodes?.filter(n => n.type === CLASSNAME_NODE).forEach(n => {
+    n.widgets?.filter(w => w.name === ID_WIDGET_TEXT).forEach(w => {
+      w.options.updateOptions(newOptions);
+    });
   });
 }
 
 app.registerExtension({
-    name: "yf0659.StripCommentsStringMultiline",
+    name: ID_NODE,
     settings: [
       {
-        id: "StripCommentsStringMultiline.Editor.theme",
-        name: "Theme",
-        type: "combo",
-        defaultValue: "vs",
-        category: ["Strip Comments String", "Editor", "Theme"],
+        id: ID_SETTINGS_THEME,
+        category: ['Strip Comments String', 'Editor', 'Theme'],
+        name: 'Theme',
+        type: 'combo',
+        defaultValue: 'vs',
         options: [
-          { text: "vs", value: "vs" },
-          { text: "vs-dark", value: "vs-dark" },
+          { text: 'vs', value: 'vs' },
+          { text: 'vs-dark', value: 'vs-dark' },
         ],
         attrs: {
           editable: false,
@@ -35,47 +43,50 @@ app.registerExtension({
         },
       },
       {
-        id: "StripCommentsStringMultiline.Editor.fontsize",
-        name: "Font size",
-        type: "slider",
+        id: ID_SETTINGS_FONTSIZE,
+        category: ['Strip Comments String', 'Editor', 'Font size'],
+        name: 'Font size',
+        type: 'slider',
         defaultValue: 10,
         attrs: {
           min: 8,
           max: 24,
           step: 1,
         },
-        category: ["Strip Comments String", "Editor", "Font size"],
         onChange: (newVal, oldVal) => {
           updateOptionsAll({fontSize: newVal});
         },
       },
       {
-        id: "StripCommentsStringMultiline.Editor.word.file",
-        name: "Custom Word",
+        id: ID_SETTINGS_WORD_FILE,
+        category: ['Strip Comments String', 'Editor', 'Custom Word'],
+        name: 'Custom Word',
         type: () => {
-          const filechooser = document.createElement("input");
-          filechooser.setAttribute("type", "file");
-          filechooser.setAttribute("accept", ".csv");
-          filechooser.addEventListener("change", (event) => {
-            const file = event.target.files[0];
-            const filereader = new FileReader();
-            filereader.onload = (event) => {
-              app.extensionManager.setting.set("StripCommentsStringMultiline.Editor.word.data", event.target.result);
-            };
-            filereader.readAsText(file);
+          const containor = document.createElement('div');
+          const app = createApp({
+            components: { FileUpload },
+            methods: {
+              onSelect: (e) => {
+                const file = e.files[0];
+                const filereader = new FileReader();
+                filereader.onload = (event) => {
+                  app.extensionManager.setting.set(ID_SETTINGS_WORD_DATA, event.target.result);
+                };
+                filereader.readAsText(file);
+              },
+            },
+            template: '<FileUpload mode="basic" chooseLabel="Choose" accept=".csv" @select="onSelect" :auto="true" />',
           });
-          return filechooser;
-        },
-        category: ["Strip Comments String", "Editor", "Custom Word"],
-        onChange: (newVal, oldVal) => {
+          app.mount(containor);
+          return containor;
         },
       },
       {
-        id: "StripCommentsStringMultiline.Editor.word.data",
-        name: "Custom Word Data",
-        type: "hidden",
-        defaultValue: "",
-        category: ["Strip Comments String", "Editor", "Custom Word Data"],
+        id: ID_SETTINGS_WORD_DATA,
+        category: ['Strip Comments String', 'Editor', 'Custom Word Data'],
+        name: 'Custom Word Data',
+        type: 'hidden',
+        defaultValue: '',
         onChange: (newVal, oldVal) => {
           WidgetEditor.setWordFromCSVString(newVal);
         },
@@ -87,18 +98,21 @@ app.registerExtension({
     async getCustomWidgets(app) {
         return {
             WidgetEditor: (node, inputName, inputData, app, widgetName) => {
+                const _node = node;
                 const editor = new WidgetEditor({
-                  theme: app.extensionManager.setting.get("StripCommentsStringMultiline.Editor.theme"),
-                  fontSize: app.extensionManager.setting.get("StripCommentsStringMultiline.Editor.fontsize")
+                  theme: app.extensionManager.setting.get(ID_SETTINGS_THEME),
+                  fontSize: app.extensionManager.setting.get(ID_SETTINGS_FONTSIZE)
                 });
                 const widget = node.addDOMWidget(inputName, inputData[0], editor.element, {
-                  getValue() {
+                  getValue: () => {
+                    _node.properties[ID_WIDGET_EDITOR_STATE] = editor.saveViewState();
                     return editor.value;
                   },
-                  setValue(newValue) {
+                  setValue: (newValue) => {
                     editor.value = newValue;
+                    editor.restoreViewState(_node.properties[ID_WIDGET_EDITOR_STATE]);
                   },
-                  updateOptions(newOptions) {
+                  updateOptions: (newOptions) => {
                     editor.updateOptions(newOptions);
                   },
                 });

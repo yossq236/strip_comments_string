@@ -3,7 +3,7 @@
     "build": "webpack"
   },
   "dependencies": {
-    "@types/papaparse": "^5.3.16",
+    "@types/papaparse": "^5.5.0",
     "monaco-editor": "^0.54.0",
     "papaparse": "^5.5.3"
   },
