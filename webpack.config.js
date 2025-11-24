@@ -8,13 +8,6 @@ module.exports = {
 
     entry: './src/ts/widget_editor.ts', 
 
-    // resolve: {
-    //     alias: {
-    //         // 'vs' というパスが来たら node_modules/monaco-editor/min/vs を見るように指定
-    //         'vs': path.resolve(__dirname, 'node_modules/monaco-editor/min/vs')
-    //     }
-    // },
-
     module: {
         rules: [
             {
