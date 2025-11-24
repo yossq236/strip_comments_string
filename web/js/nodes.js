@@ -98,25 +98,28 @@ app.registerExtension({
     async getCustomWidgets(app) {
         return {
             WidgetEditor: (node, inputName, inputData, app, widgetName) => {
-                const _node = node;
-                const editor = new WidgetEditor({
+                const _editor = new WidgetEditor({
                   theme: app.extensionManager.setting.get(ID_SETTINGS_THEME),
                   fontSize: app.extensionManager.setting.get(ID_SETTINGS_FONTSIZE)
                 });
-                const widget = node.addDOMWidget(inputName, inputData[0], editor.element, {
+                const _node = node;
+                const _widget = node.addDOMWidget(inputName, inputData[0], _editor.element, {
                   getValue: () => {
-                    _node.properties[ID_WIDGET_EDITOR_STATE] = editor.saveViewState();
-                    return editor.value;
+                    _node.properties[ID_WIDGET_EDITOR_STATE] = _editor.saveViewState();
+                    return _editor.value;
                   },
                   setValue: (newValue) => {
-                    editor.value = newValue;
-                    editor.restoreViewState(_node.properties[ID_WIDGET_EDITOR_STATE]);
+                    _editor.value = newValue;
+                    _editor.restoreViewState(_node.properties[ID_WIDGET_EDITOR_STATE]);
                   },
                   updateOptions: (newOptions) => {
-                    editor.updateOptions(newOptions);
+                    _editor.updateOptions(newOptions);
                   },
                 });
-                return widget;
+                _editor.element.addEventListener('keydown', (e) => {
+                  e.stopPropagation();
+                });
+                return _widget;
             },
         };
     },

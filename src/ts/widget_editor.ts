@@ -1,4 +1,5 @@
-import * as monaco from 'monaco-editor';
+// import * as monaco from 'monaco-editor';
+import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js';
 import * as Papa from 'papaparse';
 
 interface CustomWord {
@@ -14,15 +15,6 @@ export class WidgetEditor {
 
     constructor(options: any) {
         this._container = document.createElement('div');
-        this._container.addEventListener('keydown', (event) => {
-          event.stopPropagation();
-        });
-        this._container.addEventListener('keyup', (event) => {
-          event.stopPropagation();
-        });
-        this._container.addEventListener('keypress', (event) => {
-          event.stopPropagation();
-        });
         this._editor = monaco.editor.create(this._container, {
             automaticLayout: true,
             value: '',
@@ -123,12 +115,12 @@ export class WidgetEditor {
                   label: _word.label,
                   range: range              
                 });
-                if (20 <= _suggestions.length) break;
+                if (40 <= _suggestions.length) break;
               }
             }
           }
           return {
-            incomplete: (_suggestions.length <= 1) ? false : true,
+            incomplete: true,
             suggestions: _suggestions,
           };
         }
@@ -136,9 +128,8 @@ export class WidgetEditor {
       monaco.languages.registerFoldingRangeProvider('myCustomLanguage', {
         provideFoldingRanges: (model, context, token) => {
           const ranges = [];
-          const map_range_start = new Map<number,number>;
-          const ranges_add = (block_level:number, range_end:number) => {
-            const range_start = map_range_start.get(block_level) ?? 0;
+          const ranges_add = (block_lv_range_start:Map<number,number>, block_lv:number, range_end:number) => {
+            const range_start = block_lv_range_start.get(block_lv) ?? 0;
             if ((0 < range_start) && (0 < (range_end - range_start))) {
               ranges.push({
                 start: range_start,
@@ -148,22 +139,24 @@ export class WidgetEditor {
             }
           };
           // 
+          const block_lv_range_start = new Map<number,number>;
           let current_lineno = -1;
           model.getLinesContent().forEach((line,lineno) => {
             current_lineno = lineno + 1;
             const block_mat = /^#+/.exec(line);
             if (block_mat) {
-              const block_lvl = block_mat[0].length;
-              map_range_start.keys().filter((key) => block_lvl < key).forEach((internal_lvl) => {
-                ranges_add(internal_lvl, current_lineno - 1);
-                map_range_start.set(internal_lvl, 0);
+              const block_lv = block_mat[0].length;
+              block_lv_range_start.keys().filter((internal_block_lv) => block_lv <= internal_block_lv)
+              .forEach((internal_block_lv) => {
+                ranges_add(block_lv_range_start, internal_block_lv, current_lineno - 1);
+                block_lv_range_start.set(internal_block_lv, 0);
               });
-              ranges_add(block_lvl, current_lineno - 1);
-              map_range_start.set(block_lvl, current_lineno);
+              ranges_add(block_lv_range_start, block_lv, current_lineno - 1);
+              block_lv_range_start.set(block_lv, current_lineno);
             }
           });
-          map_range_start.keys().forEach((block_lvl) => {
-            ranges_add(block_lvl, current_lineno);
+          block_lv_range_start.keys().forEach((block_lv) => {
+            ranges_add(block_lv_range_start, block_lv, current_lineno - 1);
           });
           //
           ranges.sort((range1, range2) => {

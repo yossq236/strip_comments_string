@@ -8,6 +8,13 @@ module.exports = {
 
     entry: './src/ts/widget_editor.ts', 
 
+    // resolve: {
+    //     alias: {
+    //         // 'vs' というパスが来たら node_modules/monaco-editor/min/vs を見るように指定
+    //         'vs': path.resolve(__dirname, 'node_modules/monaco-editor/min/vs')
+    //     }
+    // },
+
     module: {
         rules: [
             {
@@ -18,16 +25,16 @@ module.exports = {
                 test: /\.css$/,
                 use: ['style-loader', 'css-loader']
             },
-            {
-                test: /\.ttf$/,
-                type: 'asset/resource'
-            },
+            // {
+            //     test: /\.ttf$/,
+            //     type: 'asset/resource'
+            // },
         ]
     },
 
     plugins: [
         new MonacoWebpackPlugin({
-            languages: []
+            languages: [],
         })
     ],
 
